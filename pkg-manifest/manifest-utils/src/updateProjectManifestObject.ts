@@ -19,6 +19,10 @@ export interface PackageSpecObject {
   saveType?: DependenciesField
 }
 
+function isSafeObjectKey (key: string): boolean {
+  return key !== '__proto__' && key !== 'constructor' && key !== 'prototype'
+}
+
 function getPeerSpecifier (spec: string, resolvedVersion?: string, pinnedVersion?: PinnedVersion): string {
   if (isValidPeerRange(spec)) return spec
 
@@ -50,6 +54,9 @@ export async function updateProjectManifestObject (
   packageSpecs: PackageSpecObject[]
 ): Promise<ProjectManifest> {
   for (const packageSpec of packageSpecs) {
+    if (!isSafeObjectKey(packageSpec.alias)) {
+      continue
+    }
     if (packageSpec.saveType) {
       const spec = packageSpec.bareSpecifier ?? findSpec(packageSpec.alias, packageManifest)
       if (spec) {
@@ -86,11 +93,13 @@ export async function updateProjectManifestObject (
 }
 
 function findSpec (alias: string, manifest: ProjectManifest): string | undefined {
+  if (!isSafeObjectKey(alias)) return undefined
   const foundDepType = guessDependencyType(alias, manifest)
   return foundDepType && manifest[foundDepType]![alias]
 }
 
 export function guessDependencyType (alias: string, manifest: ProjectManifest): DependenciesOrPeersField | undefined {
+  if (!isSafeObjectKey(alias)) return undefined
   return DEPENDENCIES_OR_PEER_FIELDS
     .find((depField) => manifest[depField]?.[alias] === '' || Boolean(manifest[depField]?.[alias]))
 }
