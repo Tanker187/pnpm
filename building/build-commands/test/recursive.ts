@@ -1,12 +1,14 @@
-import path from 'path'
+import path from 'node:path'
+
 import { assertProject } from '@pnpm/assert-project'
-import { filterPackagesFromDir } from '@pnpm/workspace.filter-packages-from-dir'
 import { rebuild } from '@pnpm/building.build-commands'
 import { preparePackages } from '@pnpm/prepare'
 import { createTestIpcServer } from '@pnpm/test-ipc-server'
 import type { PackageManifest } from '@pnpm/types'
-import execa from 'execa'
-import { sync as writeYamlFile } from 'write-yaml-file'
+import { filterPackagesFromDir } from '@pnpm/workspace.filter-packages-from-dir'
+import { safeExeca as execa } from 'execa'
+import { writeYamlFileSync } from 'write-yaml-file'
+
 import { DEFAULT_OPTS, REGISTRY } from './utils/index.js'
 
 const pnpmBin = path.join(import.meta.dirname, '../../../pnpm/bin/pnpm.mjs')
@@ -104,7 +106,7 @@ test('pnpm recursive rebuild with hoisted node linker', async () => {
   ])
 
   const { allProjects, selectedProjectsGraph } = await filterPackagesFromDir(process.cwd(), [])
-  writeYamlFile('pnpm-workspace.yaml', { packages: ['*'] })
+  writeYamlFileSync('pnpm-workspace.yaml', { packages: ['*'] })
   await execa('node', [
     pnpmBin,
     'install',
@@ -195,7 +197,7 @@ test('rebuild multiple packages in correct order', async () => {
     },
   ]
   preparePackages(pkgs)
-  writeYamlFile('pnpm-workspace.yaml', { packages: pkgs.map(pkg => pkg.name) })
+  writeYamlFileSync('pnpm-workspace.yaml', { packages: pkgs.map(pkg => pkg.name) })
 
   const { allProjects, selectedProjectsGraph } = await filterPackagesFromDir(process.cwd(), [])
   await execa('node', [

@@ -1,7 +1,8 @@
-import type { PkgResolutionId, PkgIdWithPatchHash, ProjectRootDir } from '@pnpm/types'
-import { type PartialResolvedPackage, resolvePeers } from '../lib/resolvePeers.js'
-import type { DependenciesTreeNode } from '../lib/resolveDependencies.js'
+import type { PkgIdWithPatchHash, PkgResolutionId, ProjectRootDir } from '@pnpm/types'
+
 import type { NodeId } from '../lib/nextNodeId.js'
+import type { DependenciesTreeNode } from '../lib/resolveDependencies.js'
+import { type PartialResolvedPackage, resolvePeers } from '../lib/resolvePeers.js'
 
 test('packages are not deduplicated when versions do not match', async () => {
   const fooPkg: PartialResolvedPackage = {
@@ -102,6 +103,7 @@ test('packages are not deduplicated when versions do not match', async () => {
     virtualStoreDirMaxLength: 120,
     lockfileDir: '',
     peersSuffixMaxLength: 1000,
+    workspaceProjectIds: new Set(),
   })
 
   expect(dependenciesByProjectId.project1.get('foo')).toEqual(dependenciesByProjectId.project2.get('foo'))

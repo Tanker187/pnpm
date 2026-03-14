@@ -1,6 +1,7 @@
-import assert from 'assert'
-import util from 'util'
-import { buildProjects as rebuildAll, type BuildOptions, buildSelectedPkgs } from '@pnpm/building.after-install'
+import assert from 'node:assert'
+import util from 'node:util'
+
+import { type BuildOptions, buildProjects as rebuildAll, buildSelectedPkgs } from '@pnpm/building.after-install'
 import {
   type RecursiveSummary,
   throwOnCommandFail,

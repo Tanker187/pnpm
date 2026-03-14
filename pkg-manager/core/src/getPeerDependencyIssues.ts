@@ -1,10 +1,11 @@
-import { getPreferredVersionsFromLockfileAndManifests } from '@pnpm/lockfile.preferred-versions'
-import { resolveDependencies, getWantedDependencies } from '@pnpm/resolve-dependencies'
-import type { PeerDependencyIssuesByProjects } from '@pnpm/types'
 import { getContext, type GetContextOptions, type ProjectOptions } from '@pnpm/get-context'
 import { createReadPackageHook } from '@pnpm/hooks.read-package-hook'
+import { getPreferredVersionsFromLockfileAndManifests } from '@pnpm/lockfile.preferred-versions'
 import { DEFAULT_REGISTRIES } from '@pnpm/normalize-registries'
 import { parseOverrides } from '@pnpm/parse-overrides'
+import { getWantedDependencies, resolveDependencies } from '@pnpm/resolve-dependencies'
+import type { PeerDependencyIssuesByProjects } from '@pnpm/types'
+
 import type { InstallOptions } from './install/extendInstallOptions.js'
 
 export type ListMissingPeersOptions = Partial<GetContextOptions>
@@ -97,6 +98,7 @@ export async function getPeerDependencyIssues (
       workspacePackages: ctx.workspacePackages ?? new Map(),
       supportedArchitectures: opts.supportedArchitectures,
       peersSuffixMaxLength: opts.peersSuffixMaxLength,
+      allProjectIds: Object.values(ctx.projects).map((p) => p.id),
     }
   )
 

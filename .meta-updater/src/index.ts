@@ -1,15 +1,16 @@
-import fs from 'fs'
-import path from 'path'
-import { readWantedLockfile, type LockfileObject } from '@pnpm/lockfile.fs'
-import type { ProjectId, ProjectManifest } from '@pnpm/types'
+import fs from 'node:fs'
+import path from 'node:path'
+
+import { type LockfileObject, readWantedLockfile } from '@pnpm/lockfile.fs'
 import { createUpdateOptions, type FormatPluginFnOptions } from '@pnpm/meta-updater'
 import { sortDirectKeys, sortKeysByPriority } from '@pnpm/object.key-sorting'
+import type { ProjectId, ProjectManifest } from '@pnpm/types'
 import { findWorkspacePackagesNoCheck } from '@pnpm/workspace.find-packages'
 import { readWorkspaceManifest } from '@pnpm/workspace.read-manifest'
-import isSubdir from 'is-subdir'
+import { isSubdir } from 'is-subdir'
 import { loadJsonFileSync } from 'load-json-file'
-import semver from 'semver'
 import normalizePath from 'normalize-path'
+import semver from 'semver'
 import { writeJsonFile } from 'write-json-file'
 
 const CLI_PKG_NAME = 'pnpm'
@@ -34,7 +35,7 @@ export default async (workspaceDir: string) => { // eslint-disable-line
         return manifest
       }
       if (manifest.name === 'monorepo-root') {
-        manifest.scripts!['release'] = `pnpm --filter=@pnpm/exe publish --tag=${nextTag} --access=public && pnpm publish --filter=!pnpm --filter=!@pnpm/exe --access=public && pnpm publish --filter=pnpm --tag=${nextTag} --access=public`
+        manifest.scripts!['release'] = `pnpm --filter=@pnpm/exe publish --tag=${nextTag} --access=public --provenance && pnpm publish --filter=!pnpm --filter=!@pnpm/exe --access=public --provenance && pnpm publish --filter=pnpm --tag=${nextTag} --access=public --provenance`
         return sortKeysInManifest(manifest)
       }
       if (manifest.name && manifest.name !== CLI_PKG_NAME) {
@@ -269,6 +270,7 @@ async function updateManifest (workspaceDir: string, manifest: ProjectManifest, 
   case '@pnpm/plugin-commands-script-runners':
   case '@pnpm/plugin-commands-store':
   case '@pnpm/plugin-commands-deploy':
+  case '@pnpm/plugin-commands-audit':
   case CLI_PKG_NAME:
   case '@pnpm/core': {
     preset = '@pnpm/jest-config/with-registry'
